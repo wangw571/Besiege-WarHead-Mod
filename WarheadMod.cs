@@ -19,7 +19,7 @@ namespace Blocks
                 .BlockName("Warhead")
                 .Obj(new List<Obj> { new Obj("Warhead.obj", new VisualOffset(Vector3.one, Vector3.zero, Vector3.zero)) })
                 .Scripts(new Type[] { typeof(WarheadS) })
-                .Properties(new BlockProperties().Key1("引爆", "k").Key2("保险开/关", "1")
+                .Properties(new BlockProperties().Key1("立刻引爆", "k").Key2("保险开/关", "1")
                                                  .CanBeDamaged(Mathf.Infinity)
                                                  .Slider("引爆延迟", 0, 10, 0.2f)
                                                  )
@@ -46,8 +46,10 @@ namespace Blocks
         private bool toggle;
         private int sliderValve;
         private bool 炸;
+        private bool 引火;
         private bool 保险;
         private bool 按下了;
+        private float 引信;
         private GameObject connected;
         private Collision colsion;
 
@@ -61,6 +63,8 @@ namespace Blocks
             炸 = false;
             按下了 = false;
             保险 = true;
+            引火 = false;
+            引信 = 0;
         }
         protected override void OnSimulateFixedUpdate()
         {
@@ -78,6 +82,7 @@ namespace Blocks
                 {
                     炸 = true;
                 }
+                if (引火 == true) { 引信 += Time.fixedDeltaTime;if (引信 > sliderValve) { 炸 = true; } }
                 if (炸 == true)
                 {
                     GameObject component = (GameObject)UnityEngine.Object.Instantiate(UnityEngine.Object.FindObjectOfType<AddPiece>().blockTypes[23].gameObject);
@@ -99,7 +104,7 @@ namespace Blocks
             //if (connected == null) {connected =  this.gameObject.hingeJoint.connectedBody.gameObject;Debug.Log(connected); }
             if (保险 == false /*&& Math.Abs(collision.relativeVelocity.x)+ Math.Abs(collision.relativeVelocity.y)+ Math.Abs(collision.relativeVelocity.z) > 3*/)
             {
-                炸 = true;
+                引火 = true;
             }
             Debug.Log(Math.Abs(colsion.relativeVelocity.x) + Math.Abs(colsion.relativeVelocity.y) + Math.Abs(colsion.relativeVelocity.z));
         }
